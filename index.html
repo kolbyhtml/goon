@@ -43,25 +43,26 @@
     <script>
         async function fetchIPInfo() {
             try {
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
+                const ipinfoResponse = await fetch('https://ipinfo.io/json?token=a6640fef2c0242');
+                const ipinfoData = await ipinfoResponse.json();
+
+                const ipapiResponse = await fetch('https://ipapi.co/json/');
+                const ipapiData = await ipapiResponse.json();
+
                 const screenWidth = screen.width;
                 const screenHeight = screen.height;
                 const browserInfo = navigator.userAgent;
-                return `IP Address: ${data.ip}
-Country: ${data.country_name}
-Region: ${data.region}
-City: ${data.city}
-ZIP Code: ${data.postal}
-Latitude: ${data.latitude}
-Longitude: ${data.longitude}
-Timezone: ${data.timezone}
-ISP: ${data.org}
-AS: ${data.as}
-Currency: ${data.currency}
-Language: ${data.lang}
-Mobile: ${data.mobile}
-Proxy: ${data.proxy}
+
+                return `IP Address: ${ipapiData.ip}
+Country: ${ipapiData.country_name}
+Region: ${ipapiData.region}
+City: ${ipapiData.city}
+Postal Code: ${ipapiData.postal}
+Latitude: ${ipapiData.latitude}
+Longitude: ${ipapiData.longitude}
+Timezone: ${ipapiData.timezone}
+ISP: ${ipapiData.org}
+Currency: ${ipapiData.currency_name}
 Screen Width: ${screenWidth} pixels
 Screen Height: ${screenHeight} pixels
 Browser: ${browserInfo}`;
@@ -79,7 +80,7 @@ Browser: ${browserInfo}`;
                     i++;
                     setTimeout(type, speed);
                 } else {
-                    setTimeout(startTyping, 2000); // Restart after 2 seconds
+                    setTimeout(startTyping, 6000); // Restart after 2 seconds
                 }
             }
             type();
