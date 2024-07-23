@@ -4,14 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
             font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #intro-screen {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            background-color: black;
+            color: white;
+            z-index: 10;
+        }
+        #enter-text {
+            font-size: 18px;
+            text-align: center;
+            color: white;
+            text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px white, 0 0 10px white, 0 0 15px white;
+            }
+            to {
+                text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white;
+            }
+        }
+        #main-content {
+            display: none;
+            font-family: Arial, sans-serif;
             height: 100vh;
             margin: 0;
-            background-image: url('OIP.jpeg'); /* Make sure this file exists in the same folder as your HTML file */
+            background-image: url('OIP.jpeg');
             background-size: cover;
             background-position: center;
             color: white;
@@ -34,31 +65,45 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1></h1>
-        <div id="ip-info">Loading...</div>
+    <div id="intro-screen">
+        <div id="enter-text">CLICK TO ENTER...</div>
+    </div>
+    
+    <div id="main-content">
+        <div class="container">
+            <h1></h1>
+            <div id="ip-info">Loading...</div>
+        </div>
     </div>
 
-    <!-- Add the audio element here -->
-    <audio autoplay loop>
+    <audio id="background-audio" loop>
         <source src="cm-chat-media-video-1_20efe56b-2ec1-57f0-80fd-1fa5d7f4e97b_19520_0_0.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
     <script>
+        document.getElementById('intro-screen').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('main-content').style.display = 'flex';
+            document.getElementById('main-content').style.justifyContent = 'center';
+            document.getElementById('main-content').style.alignItems = 'center';
+            document.getElementById('background-audio').play();
+            startTyping();
+        });
+
         async function fetchIPInfo() {
             try {
-                const ipinfoResponse = await fetch('https://ipinfo.io/json?token=a6640fef2c0242');
-                const ipinfoData = await ipinfoResponse.json();
+                const ipv4Response = await fetch('https://api.ipify.org?format=json');
+                const ipv4Data = await ipv4Response.json();
 
-                const ipapiResponse = await fetch('https://ipapi.co/json/');
+                const ipapiResponse = await fetch(`https://ipapi.co/${ipv4Data.ip}/json/`);
                 const ipapiData = await ipapiResponse.json();
 
                 const screenWidth = screen.width;
                 const screenHeight = screen.height;
                 const browserInfo = navigator.userAgent;
 
-                return `IP Address: ${ipapiData.ip}
+                return `IP Address: ${ipv4Data.ip}
 Country: ${ipapiData.country_name}
 Region: ${ipapiData.region}
 City: ${ipapiData.city}
@@ -85,7 +130,7 @@ Browser: ${browserInfo}`;
                     i++;
                     setTimeout(type, speed);
                 } else {
-                    setTimeout(startTyping, 6000); // Restart after 2 seconds
+                    setTimeout(startTyping, 6000); // Restart
                 }
             }
             type();
@@ -97,8 +142,6 @@ Browser: ${browserInfo}`;
             infoElement.innerHTML = '';
             typeWriter(ipInfo, infoElement);
         }
-
-        startTyping();
     </script>
 </body>
 </html>
