@@ -64,11 +64,76 @@
         #ip-info {
             white-space: pre-line;
         }
+        #game-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #000000;
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 20;
+        }
+        #game-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: red;
+            z-index: 30;
+            cursor: pointer;
+        }
+        #result {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 36px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        #exit-game, #play-again {
+            position: absolute;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #exit-game {
+            top: 20px;
+            right: 20px;
+            background-color: #f44336;
+        }
+        #play-again {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: hwb(115 20% 23%);
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div id="intro-screen">
         <div id="enter-text">click to enter.</div>
+    </div>
+    
+    <button id="game-button">Reaction Game</button>
+
+    <div id="game-screen">
+        <div id="result"></div>
+        <button id="exit-game">Exit Game</button>
+        <button id="play-again">Play Again</button>
     </div>
     
     <div id="main-content">
@@ -86,6 +151,13 @@
     <script>
         const enterText = document.getElementById('enter-text');
         const introScreen = document.getElementById('intro-screen');
+        const gameButton = document.getElementById('game-button');
+        const gameScreen = document.getElementById('game-screen');
+        const result = document.getElementById('result');
+        const exitGame = document.getElementById('exit-game');
+        const playAgain = document.getElementById('play-again');
+
+        let startTime, endTime;
 
         introScreen.addEventListener('mousemove', (e) => {
             const { width, height } = introScreen.getBoundingClientRect();
@@ -102,14 +174,50 @@
             enterText.style.backgroundPosition = 'center';
         });
 
-        introScreen.addEventListener('click', function() {
-            this.style.display = 'none';
-            document.getElementById('main-content').style.display = 'flex';
-            document.getElementById('main-content').style.justifyContent = 'center';
-            document.getElementById('main-content').style.alignItems = 'center';
-            document.getElementById('background-audio').play();
-            startTyping();
+        introScreen.addEventListener('click', function(e) {
+            if (e.target !== gameButton) {
+                this.style.display = 'none';
+                document.getElementById('main-content').style.display = 'flex';
+                document.getElementById('main-content').style.justifyContent = 'center';
+                document.getElementById('main-content').style.alignItems = 'center';
+                document.getElementById('background-audio').play();
+                startTyping();
+            }
         });
+
+        gameButton.addEventListener('click', startGame);
+        exitGame.addEventListener('click', exitGameFunction);
+        playAgain.addEventListener('click', startGame);
+
+        function startGame() {
+            gameScreen.style.display = 'block';
+            gameScreen.style.backgroundColor = 'red';
+            result.textContent = 'Wait for green...';
+            playAgain.style.display = 'none';
+
+            setTimeout(() => {
+                gameScreen.style.backgroundColor = 'green';
+                startTime = new Date().getTime();
+            }, Math.random() * 3000 + 1000); // Random delay between 1-4 seconds
+        }
+
+        gameScreen.addEventListener('click', function(e) {
+            if (e.target !== exitGame && e.target !== playAgain) {
+                if (gameScreen.style.backgroundColor === 'green') {
+                    endTime = new Date().getTime();
+                    const reactionTime = endTime - startTime;
+                    result.textContent = `Your reaction time: ${reactionTime} ms`;
+                    playAgain.style.display = 'block';
+                } else {
+                    result.textContent = 'Too early! Wait for green.';
+                    playAgain.style.display = 'block';
+                }
+            }
+        });
+
+        function exitGameFunction() {
+            gameScreen.style.display = 'none';
+        }
 
         async function fetchIPInfo() {
             try {
