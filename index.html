@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+
+        
+        #intro-screen {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+            z-index: 10;
+        }
+        #enter-text {
+            font-size: 62px;
+            font-weight: 300;
+            text-align: center;
+            font-family: 'Trajan Pro', 'Times New Roman', serif;
+            text-transform: lowercase;
+            letter-spacing: 4px;
+            background-image: url('https://th.bing.com/th/id/R.17584ceddf03d26f02cc4048e2ae8a47?rik=6%2b4ou5ewsJKjRg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-CtBZ0q07Itw%2fVY4nDetKzcI%2fAAAAAAAAAiE%2fwrY2DVPq2t0%2fs1600%2famerican-flag.png&ehk=Y4eVhCDS13M0rbWj6OWa1%2f4VeJlBupkz79QoRkFmInI%3d&risl=&pid=ImgRaw&r=0');
+            background-size: cover;
+            background-position: center;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            cursor: pointer;
+            transition: background-position 0.1s ease-out;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+        #main-content {
+            display: none;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            background-image: url('OIP.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+        #ip-info {
+            white-space: pre-line;
+        }
+        #game-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #000000;
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 20;
+        }
+        #game-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: red;
+            z-index: 30;
+            cursor: pointer;
+        }
+        #result {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 36px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        #exit-game, #play-again {
+            position: absolute;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #exit-game {
+            top: 20px;
+            right: 20px;
+            background-color: #f44336;
+        }
+        #play-again {
+            
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: hwb(115 20% 23%);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="intro-screen">
+        <div id="enter-text">click to enter.</div>
+    </div>
+    
+    <button id="game-button">Reaction Game</button>
+
+    <div id="game-screen">
+        <div id="result"></div>
+        <button id="exit-game">Exit Game</button>
+        <button id="play-again">Play Again</button>
+    </div>
+    
+    <div id="main-content">
+        <div class="container">
+            <h1></h1>
+            <div id="ip-info">Loading...</div>
+        </div>
+    </div>
+
+    <audio id="background-audio" loop>
+        <source src="cm-chat-media-video-1_20efe56b-2ec1-57f0-80fd-1fa5d7f4e97b_19520_0_0.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const enterText = document.getElementById('enter-text');
+        const introScreen = document.getElementById('intro-screen');
+        const gameButton = document.getElementById('game-button');
+        const gameScreen = document.getElementById('game-screen');
+        const result = document.getElementById('result');
+        const exitGame = document.getElementById('exit-game');
+        const playAgain = document.getElementById('play-again');
+
+        let startTime, endTime;
+
+        introScreen.addEventListener('mousemove', (e) => {
+            const { width, height } = introScreen.getBoundingClientRect();
+            const offsetX = (e.clientX - width / 2) / width;
+            const offsetY = (e.clientY - height / 2) / height;
+            
+            const moveX = offsetX * 40;
+            const moveY = offsetY * 40;
+            
+            enterText.style.backgroundPosition = `calc(50% + ${moveX}px) calc(50% + ${moveY}px)`;
+        });
+
+        introScreen.addEventListener('mouseleave', () => {
+            enterText.style.backgroundPosition = 'center';
+        });
+
+        introScreen.addEventListener('click', function(e) {
+            if (e.target !== gameButton) {
+                this.style.display = 'none';
+                document.getElementById('main-content').style.display = 'flex';
+                document.getElementById('main-content').style.justifyContent = 'center';
+                document.getElementById('main-content').style.alignItems = 'center';
+                document.getElementById('background-audio').play();
+                startTyping();
+            }
+        });
+
+        gameButton.addEventListener('click', startGame);
+        exitGame.addEventListener('click', exitGameFunction);
+        playAgain.addEventListener('click', startGame);
+
+        function startGame() {
+            gameScreen.style.display = 'block';
+            gameScreen.style.backgroundColor = 'red';
+            result.textContent = 'Wait for green...';
+            playAgain.style.display = 'none';
+
+            setTimeout(() => {
+                gameScreen.style.backgroundColor = 'green';
+                startTime = new Date().getTime();
+            }, Math.random() * 3000 + 1000); // Random delay between 1-4 seconds
+        }
+
+        gameScreen.addEventListener('click', function(e) {
+            if (e.target !== exitGame && e.target !== playAgain) {
+                if (gameScreen.style.backgroundColor === 'green') {
+                    endTime = new Date().getTime();
+                    const reactionTime = endTime - startTime;
+                    result.textContent = `Your reaction time: ${reactionTime} ms`;
+                    playAgain.style.display = 'block';
+                } else {
+                    result.textContent = 'Too early! Wait for green.';
+                    playAgain.style.display = 'block';
+                }
+            }
+        });
+
+        function exitGameFunction() {
+            gameScreen.style.display = 'none';
+        }
+
+        async function fetchIPInfo() {
+            try {
+                const ipv4Response = await fetch('https://api.ipify.org?format=json');
+                const ipv4Data = await ipv4Response.json();
+
+                const ipapiResponse = await fetch(`https://ipapi.co/${ipv4Data.ip}/json/`);
+                const ipapiData = await ipapiResponse.json();
+
+                const screenWidth = screen.width;
+                const screenHeight = screen.height;
+                const browserInfo = navigator.userAgent;
+
+                return `IP Address: ${ipv4Data.ip}
+Country: ${ipapiData.country_name}
+Region: ${ipapiData.region}
+City: ${ipapiData.city}
+Postal Code: ${ipapiData.postal}
+Latitude: ${ipapiData.latitude}
+Longitude: ${ipapiData.longitude}
+Timezone: ${ipapiData.timezone}
+ISP: ${ipapiData.org}
+Currency: ${ipapiData.currency_name}
+Screen Width: ${screenWidth} pixels
+Screen Height: ${screenHeight} pixels
+Browser: ${browserInfo}`;
+            } catch (error) {
+                console.error('Error fetching IP info:', error);
+                return 'Unable to fetch IP information';
+            }
+        }
+
+        function typeWriter(text, element, speed = 40) {
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        async function startTyping() {
+            const ipInfo = await fetchIPInfo();
+            const infoElement = document.getElementById('ip-info');
+            infoElement.innerHTML = '';
+            typeWriter(ipInfo, infoElement);
+        }
+    </script>
+
+</body>
+</html>
